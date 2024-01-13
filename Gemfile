@@ -20,3 +20,5 @@ gem "tapioca", "~> 0.11", require: false, platforms: :ruby
 gem "psych", "~> 5.1", require: false
 gem "rails"
 gem "tzinfo-data", platforms: :windows
+
+gem "ruby-lsp", github: "Shopify/ruby-lsp", branch: "expose-document-symbol-stack"

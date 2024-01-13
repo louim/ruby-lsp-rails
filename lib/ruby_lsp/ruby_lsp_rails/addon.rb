@@ -6,6 +6,7 @@ require "ruby_lsp/addon"
 require_relative "rails_client"
 require_relative "hover"
 require_relative "code_lens"
+require_relative "document_symbol"
 
 module RubyLsp
   module Rails
@@ -45,6 +46,16 @@ module RubyLsp
       end
       def create_hover_listener(nesting, index, dispatcher)
         Hover.new(client, nesting, index, dispatcher)
+      end
+
+      sig do
+        override.params(
+          stack: RubyDocument::DocumentSymbolStack,
+          dispatcher: Prism::Dispatcher,
+        ).returns(Object)
+      end
+      def create_document_symbol_listener(stack, dispatcher)
+        DocumentSymbol.new(stack, dispatcher)
       end
 
       sig { override.returns(String) }

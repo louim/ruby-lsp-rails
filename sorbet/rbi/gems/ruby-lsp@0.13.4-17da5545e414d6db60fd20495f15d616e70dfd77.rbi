@@ -748,7 +748,7 @@ class RubyLsp::Addon
 
   # Creates a new Definition listener. This method is invoked on every Definition request
   #
-  # source://ruby-lsp/lib/ruby_lsp/addon.rb#145
+  # source://ruby-lsp/lib/ruby_lsp/addon.rb#146
   sig do
     overridable
       .params(
@@ -762,14 +762,15 @@ class RubyLsp::Addon
 
   # Creates a new DocumentSymbol listener. This method is invoked on every DocumentSymbol request
   #
-  # source://ruby-lsp/lib/ruby_lsp/addon.rb#134
+  # source://ruby-lsp/lib/ruby_lsp/addon.rb#135
   sig do
     overridable
       .params(
+        stack: ::RubyLsp::RubyDocument::DocumentSymbolStack,
         dispatcher: ::Prism::Dispatcher
-      ).returns(T.nilable(RubyLsp::Listener[T::Array[::LanguageServer::Protocol::Interface::DocumentSymbol]]))
+      ).returns(::Object)
   end
-  def create_document_symbol_listener(dispatcher); end
+  def create_document_symbol_listener(stack, dispatcher); end
 
   # Creates a new Hover listener. This method is invoked on every Hover request
   #
@@ -1728,69 +1729,69 @@ class RubyLsp::Listeners::DocumentSymbol < ::RubyLsp::Listener
 
   ResponseType = type_member { { fixed: T::Array[::LanguageServer::Protocol::Interface::DocumentSymbol] } }
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#30
-  sig { params(dispatcher: ::Prism::Dispatcher).void }
-  def initialize(dispatcher); end
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#23
+  sig { params(stack: ::RubyLsp::RubyDocument::DocumentSymbolStack, dispatcher: ::Prism::Dispatcher).void }
+  def initialize(stack, dispatcher); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#27
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#15
   sig { override.returns(T::Array[::LanguageServer::Protocol::Interface::DocumentSymbol]) }
   def _response; end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#91
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#80
   sig { params(node: ::Prism::CallNode).void }
   def on_call_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#59
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#48
   sig { params(node: ::Prism::ClassNode).void }
   def on_class_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#69
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#58
   sig { params(node: ::Prism::ClassNode).void }
   def on_class_node_leave(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#189
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#178
   sig { params(node: ::Prism::ClassVariableWriteNode).void }
   def on_class_variable_write_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#113
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#102
   sig { params(node: ::Prism::ConstantPathWriteNode).void }
   def on_constant_path_write_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#123
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#112
   sig { params(node: ::Prism::ConstantWriteNode).void }
   def on_constant_write_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#148
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#137
   sig { params(node: ::Prism::DefNode).void }
   def on_def_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#133
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#122
   sig { params(node: ::Prism::DefNode).void }
   def on_def_node_leave(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#179
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#168
   sig { params(node: ::Prism::InstanceVariableWriteNode).void }
   def on_instance_variable_write_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#138
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#127
   sig { params(node: ::Prism::ModuleNode).void }
   def on_module_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#174
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#163
   sig { params(node: ::Prism::ModuleNode).void }
   def on_module_node_leave(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#74
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#63
   sig { params(node: ::Prism::SingletonClassNode).void }
   def on_singleton_class_node_enter(node); end
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#86
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#75
   sig { params(node: ::Prism::SingletonClassNode).void }
   def on_singleton_class_node_leave(node); end
 
   private
 
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#208
+  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#197
   sig do
     params(
       name: ::String,
@@ -1804,17 +1805,6 @@ end
 
 # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#12
 RubyLsp::Listeners::DocumentSymbol::ATTR_ACCESSORS = T.let(T.unsafe(nil), Array)
-
-# source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#14
-class RubyLsp::Listeners::DocumentSymbol::SymbolHierarchyRoot
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#21
-  sig { void }
-  def initialize; end
-
-  # source://ruby-lsp/lib/ruby_lsp/listeners/document_symbol.rb#18
-  sig { returns(T::Array[::LanguageServer::Protocol::Interface::DocumentSymbol]) }
-  def children; end
-end
 
 # source://ruby-lsp/lib/ruby_lsp/listeners/folding_ranges.rb#6
 class RubyLsp::Listeners::FoldingRanges < ::RubyLsp::Listener
@@ -2722,7 +2712,7 @@ class RubyLsp::Requests::DocumentSymbol < ::RubyLsp::Requests::Request
   sig { params(dispatcher: ::Prism::Dispatcher).void }
   def initialize(dispatcher); end
 
-  # source://ruby-lsp/lib/ruby_lsp/requests/document_symbol.rb#66
+  # source://ruby-lsp/lib/ruby_lsp/requests/document_symbol.rb#63
   sig { override.returns(ResponseType) }
   def perform; end
 
@@ -3528,6 +3518,44 @@ class RubyLsp::RubyDocument < ::RubyLsp::Document
   def parse; end
 end
 
+# source://ruby-lsp/lib/ruby_lsp/ruby_document.rb#26
+class RubyLsp::RubyDocument::DocumentSymbolStack
+  # source://ruby-lsp/lib/ruby_lsp/ruby_document.rb#30
+  sig { void }
+  def initialize; end
+
+  # @param symbol [Interface::DocumentSymbol]
+  # @return [void]
+  #
+  # source://sorbet-runtime/0.5.11180lib/types/private/methods/_methods.rb#252
+  def <<(*args, **_arg1, &blk); end
+
+  # source://ruby-lsp/lib/ruby_lsp/ruby_document.rb#52
+  sig do
+    returns(T.any(::LanguageServer::Protocol::Interface::DocumentSymbol, ::RubyLsp::RubyDocument::SymbolHierarchyRoot))
+  end
+  def peek; end
+
+  # source://ruby-lsp/lib/ruby_lsp/ruby_document.rb#45
+  sig { returns(T.nilable(::LanguageServer::Protocol::Interface::DocumentSymbol)) }
+  def pop; end
+
+  # source://ruby-lsp/lib/ruby_lsp/ruby_document.rb#38
+  sig { params(symbol: ::LanguageServer::Protocol::Interface::DocumentSymbol).void }
+  def push(symbol); end
+end
+
+# source://ruby-lsp/lib/ruby_lsp/ruby_document.rb#14
+class RubyLsp::RubyDocument::SymbolHierarchyRoot
+  # source://ruby-lsp/lib/ruby_lsp/ruby_document.rb#21
+  sig { void }
+  def initialize; end
+
+  # source://ruby-lsp/lib/ruby_lsp/ruby_document.rb#18
+  sig { returns(T::Array[::LanguageServer::Protocol::Interface::DocumentSymbol]) }
+  def children; end
+end
+
 # source://ruby-lsp/lib/ruby_lsp/server.rb#11
 class RubyLsp::Server
   # source://ruby-lsp/lib/ruby_lsp/server.rb#15
@@ -3677,14 +3705,14 @@ class URI::Source < ::URI::File
   sig { params(v: T.nilable(::String)).returns(T::Boolean) }
   def check_host(v); end
 
-  # source://uri/0.12.1uri/generic.rb#243
+  # source://uri/0.13.0uri/generic.rb#243
   def gem_name; end
 
   # source://ruby-lsp/lib/ruby_lsp/requests/support/source_uri.rb#26
   sig { returns(T.nilable(::String)) }
   def gem_version; end
 
-  # source://uri/0.12.1uri/generic.rb#283
+  # source://uri/0.13.0uri/generic.rb#283
   def line_number; end
 
   # source://ruby-lsp/lib/ruby_lsp/requests/support/source_uri.rb#52
